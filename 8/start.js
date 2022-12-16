@@ -7,45 +7,13 @@ const rl = readline.createInterface({
   terminal: false,
 });
 
-const containsNumbersGreaterThan = (number, array) => {
-  let hasGreaterNumber = false;
-  array.forEach((n) => {
-    if (n > number) {
-      hasGreaterNumber = true;
-    }
-  });
-  return hasGreaterNumber;
-};
+const containsNumbersGreaterThan = (number, array) =>
+  array.some((n) => n > number);
 
-const getScenicScore = (number, prevArrays, postArrays) => {
-  const scores = [];
-  prevArrays.forEach((array) => {
-    let score = 0;
-    for (i = array.length - 1; i >= 0; i--) {
-      score = score + 1;
-      if (array[i] >= number) {
-        break;
-      }
-    }
-    if (score > 0) {
-      scores.push(score);
-    }
-  });
-
-  postArrays.forEach((array) => {
-    let score = 0;
-    for (i = 0; i < array.length; i++) {
-      score = score + 1;
-      if (array[i] >= number) {
-        break;
-      }
-    }
-    if (score > 0) {
-      scores.push(score);
-    }
-  });
-  return scores.reduce((a, b) => a * b);
-};
+const getScenicScore = (number, arrays) =>
+  arrays
+    .map((array) => array.findIndex((num) => num >= number) + 1 || array.length)
+    .reduce((a, b) => a * b);
 
 const getPrevPostYArrays = (matrix, rowIndex, numberIndex) => {
   const prevArrayY = [];
@@ -122,11 +90,12 @@ rl.on("close", () => {
           }
         }
       }
-      const scenicScore = getScenicScore(
-        number,
-        [prevArrayX, prevArrayY],
-        [postArrayX, postArrayY]
-      );
+      const scenicScore = getScenicScore(number, [
+        prevArrayX.reverse(),
+        prevArrayY.reverse(),
+        postArrayX,
+        postArrayY,
+      ]);
 
       if (scenicScore > bestScenicScore) {
         bestScenicScore = scenicScore;
